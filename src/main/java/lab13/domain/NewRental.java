@@ -9,22 +9,22 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.*;
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "Rental")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-@Table(name = "Rental")
+@Table(name = "rental")
 @Transactional
 public class NewRental extends BaseEntity<Long>{
 
     private static final int BASEPRICE=10;
 
-    @Id
-    @GeneratedValue
-    Long id;
+//    @Id
+//    @GeneratedValue
+//    Long id;
 
     @Column
     @Convert(converter=LocalDateConverter.class)
@@ -34,12 +34,12 @@ public class NewRental extends BaseEntity<Long>{
     @Convert(converter=LocalDateConverter.class)
     LocalDate endDate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="mId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Movie movie;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="cId")
     @OnDelete(action = OnDeleteAction.CASCADE)
     Client client;

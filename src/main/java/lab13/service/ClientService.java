@@ -1,6 +1,7 @@
 package lab13.service;
 
 import lab13.domain.Client;
+import lab13.repository.n.plusone.repository.ClientGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ public class ClientService implements ClientServiceInt {
 
 
     @Autowired
-    private ClientRepository repository;
+    private ClientGraphRepository repository;
 
 
     /**

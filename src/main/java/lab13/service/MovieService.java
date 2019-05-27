@@ -1,6 +1,7 @@
 package lab13.service;
 
 import lab13.domain.Movie;
+import lab13.repository.n.plusone.repository.MovieGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class MovieService implements MovieServiceInt {
 
 
     @Autowired
-    private MovieRepository repo;
+    private MovieGraphRepository repo;
 
     /**
      * Adds a {@code Movie} to the corresponding lab13.repository.
