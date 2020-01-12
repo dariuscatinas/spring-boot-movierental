@@ -8,8 +8,7 @@ import lombok.*;
 @Data
 @ToString(callSuper = true)
 @Builder
-public class MovieDto extends BaseDto {
-    private String title;
-    private String genre;
-    private float rating;
+public class AccountDto extends BaseDto {
+    private int balance;
+    private boolean isImportant;
 }

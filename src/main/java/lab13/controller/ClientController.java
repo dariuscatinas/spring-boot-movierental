@@ -1,9 +1,13 @@
 package lab13.controller;
 
+import lab13.converter.AccountConverter;
 import lab13.converter.ClientConverter;
+import lab13.domain.Account;
 import lab13.domain.Client;
+import lab13.dto.AccountDto;
 import lab13.dto.ClientDto;
 import lab13.dto.ClientsDto;
+import lab13.dto.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,8 +16,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import lab13.service.ClientServiceInt;
+import org.springframework.web.context.request.WebRequest;
 
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -29,6 +36,9 @@ public class ClientController {
 
     @Autowired
     private ClientConverter clientConverter;
+
+    @Autowired
+    private AccountConverter accountConverter;
 
     @RequestMapping(value = "/clients", method = RequestMethod.GET)
     Set<ClientDto> getAllClients() {
@@ -94,24 +104,24 @@ public class ClientController {
         return result;
     }
 
-    @RequestMapping(value="clients/filterG/{age}", method = RequestMethod.GET)
-    ClientsDto filterClientsG(@PathVariable int age){
+    @RequestMapping(value="/clients/{clientId}",method = RequestMethod.POST)
+    ClientDto addAccount(@PathVariable Long clientId, @RequestBody AccountDto accountDto){
+        log.info("adding account: clientid={}", clientId);
+        Account account = accountConverter.convertDtoToModel(accountDto);
+        Optional<Client> clientOptional = clientService.addAccount(clientId, account);
+        if (!clientOptional.isPresent()){
+            throw new RuntimeException("Cannot perform operation.");
+        }
+        return clientConverter.convertModelToDto(clientOptional.get());
 
-        return new ClientsDto(clientConverter.convertModelsToDtos(
-                clientService.getAllClients().stream().filter(c->c.getAge()>age).collect(Collectors.toSet())));
     }
 
-    @RequestMapping(value="clients/filterL/{age}", method = RequestMethod.GET)
-    ClientsDto filterClientsL(@PathVariable int age){
 
-        return new ClientsDto(clientConverter.convertModelsToDtos(
-                clientService.getAllClients().stream().filter(c->c.getAge()<age).collect(Collectors.toSet())));
-    }
-
-    @RequestMapping(value="clients/filter",method = RequestMethod.GET)
-    ClientsDto filterClients(@RequestParam("age") String age) {
-        return new ClientsDto(clientConverter.convertModelsToDtos(
-                clientService.getAllClients().stream().filter(c->c.getAge()<Integer.parseInt(age)).collect(Collectors.toSet())));
-
+    @ExceptionHandler(Exception.class)
+    public final ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getLocalizedMessage());
+        ErrorResponse error = ErrorResponse.builder().message(details.get(0)).status(500).build();
+        return new ResponseEntity(error, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface ClientGraphRepository extends JPARepository< Client, Long> {
+public interface ClientGraphRepository extends JPARepository< Client, Long>, ClientJPQLRepository{
     @Query("select distinct c from Client c")
     @EntityGraph(value = "clientWithRentals", type =
             EntityGraph.EntityGraphType.LOAD)

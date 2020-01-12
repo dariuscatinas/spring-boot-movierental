@@ -1,6 +1,8 @@
 package lab13.service;
 
+import lab13.domain.Account;
 import lab13.domain.Client;
+import lab13.repository.AccountRepository;
 import lab13.repository.n.plusone.repository.ClientGraphRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +11,11 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import lab13.repository.ClientRepository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
+
+import javax.swing.text.html.Option;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -25,7 +31,10 @@ public class ClientService implements ClientServiceInt {
 
 
     @Autowired
-    private ClientGraphRepository repository;
+    private ClientRepository repository;
+
+    @Autowired
+    private AccountRepository accountRepository;
 
 
     /**
@@ -34,7 +43,12 @@ public class ClientService implements ClientServiceInt {
      */
     public Optional<Client> addClient(Client client) {
 
+        Assert.isTrue(client.getAge() > 0, "Client age has to be > 0");
+        Assert.isTrue(client.getName().length() > 0, "Client name has got to be not empty");
+        Assert.isTrue(client.getEmail().contains("@"), "Client's email has to be of valid format");
         log.trace("add client client={}", client);
+        Optional<Client> isPresent = repository.findClientByName(client.getName());
+        Assert.isTrue(!isPresent.isPresent(), "Client with name already present");
         Optional<Client> added= Optional.of(repository.save(client));
         log.trace("method finished ---");
         return added;
@@ -65,18 +79,6 @@ public class ClientService implements ClientServiceInt {
         return clients;
     }
 
-    /**
-     * filter the clients based on a predice
-     * @param predicate a {@code Predicate} predicate which takes in a Client and returns true if the Client matches the conditions
-     * @return A set of clients, which match the predicate
-     */
-    public Set<Client> filterCustom(Predicate<? super Client> predicate){
-
-        log.trace("filterClients filter={}",predicate);
-        Set<Client> clients= StreamSupport.stream(repository.findAll().spliterator(), false).filter(predicate).collect(Collectors.toSet());
-        log.trace("result={}",clients);
-        return clients;
-    }
 
     /**
      * Updates an existing client
@@ -85,7 +87,6 @@ public class ClientService implements ClientServiceInt {
      */
     @Transactional
     public Optional<Client> update(long id,Client newClient){
-
         log.trace("updateClient newClient={}",newClient);
         Optional<Client> dbClient=repository.findById(id);
         Client result=dbClient.orElse(newClient);
@@ -107,6 +108,17 @@ public class ClientService implements ClientServiceInt {
         log.trace("method finished ---");
         return client;
     }
+    @Transactional
+    public Optional<Client> addAccount(long clientId, Account newAccount){
+        log.info("adding.... ");
+        Optional<Client> clientOptional = repository.findById(clientId);
+        Assert.isTrue(clientOptional.isPresent(), "Client not found. Try again!");
+        Client client = clientOptional.get();
+        newAccount.setClient(client);
+        client.getAccounts().add(newAccount);
+        accountRepository.save(newAccount);
+        return Optional.of(client);
 
+    }
 
 }

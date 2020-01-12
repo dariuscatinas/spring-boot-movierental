@@ -6,8 +6,8 @@ import javax.persistence.*;
 import java.util.List;
 
 @NamedEntityGraphs({
-        @NamedEntityGraph(name = "clientWithRentals",
-                attributeNodes = @NamedAttributeNode(value = "rentals")),
+        @NamedEntityGraph(name = "clientWithAccounts",
+                attributeNodes = @NamedAttributeNode(value = "accounts")),
 
 
 //        @NamedEntityGraph(name = "movieWithRentalsAndCl",
@@ -32,9 +32,7 @@ public class Client extends BaseEntity<Long> {
     private String name;
     private String email;
     private int age;
-    @ToString.Exclude
-    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.LAZY, mappedBy = "client", orphanRemoval = true)
-    List<NewRental> rentals;
-
+    @OneToMany(cascade = CascadeType.ALL , fetch = FetchType.EAGER, mappedBy = "client", orphanRemoval = true)
+    List<Account> accounts;
 
 }
