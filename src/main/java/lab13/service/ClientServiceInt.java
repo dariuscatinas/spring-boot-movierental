@@ -3,6 +3,7 @@ package lab13.service;
 import lab13.domain.Account;
 import lab13.domain.Client;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -14,4 +15,5 @@ public interface ClientServiceInt{
     Optional<Client> update(long id,Client newClient);
     Optional<Client> findOne(long cnp);
     Optional<Client> addAccount(long clientId, Account newAccount);
+    List<Account> getAllAccounts();
 }

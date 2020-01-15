@@ -1,13 +1,21 @@
 plugins {
 	id 'org.springframework.boot' version '2.1.5.RELEASE'
 	id 'java'
+	id 'com.palantir.git-version' version '0.12.2'
+
 }
 
 apply plugin: 'io.spring.dependency-management'
 
 group = 'com.example'
-version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '1.8'
+
+version gitVersion()
+def details = versionDetails()
+println(details.gitHash)
+ant.replaceregexp(match:'public String versionHash = ".*";', replace: "public String versionHash = \"$details.gitHash\";", flags:'g', byline:true) {
+	fileset(dir: "$rootDir/src/main/java/lab13/controller", includes: 'VersionController.java')
+}
 
 configurations {
 	compileOnly {
@@ -40,3 +48,4 @@ dependencies {
 
 
 }
+

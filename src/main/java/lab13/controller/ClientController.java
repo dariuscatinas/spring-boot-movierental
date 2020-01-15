@@ -70,7 +70,7 @@ public class ClientController {
         Optional<Client> updated=clientService.update(id,clientConverter.convertDtoToModel(clientDto));
         ClientDto result=clientConverter.convertModelToDto(updated.get());
 
-        log.trace("updateClient: resul={}",result);
+        log.trace("updateClient: result={}",result);
 
         return result;
     }
@@ -114,6 +114,12 @@ public class ClientController {
         }
         return clientConverter.convertModelToDto(clientOptional.get());
 
+    }
+
+    @RequestMapping(value="/accounts", method = RequestMethod.GET)
+    Set<AccountDto> getAllAccounts(){
+        log.info("Getting accounts... controller");
+        return accountConverter.convertModelsToDtos(clientService.getAllAccounts());
     }
 
 

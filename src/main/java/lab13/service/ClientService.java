@@ -62,10 +62,11 @@ public class ClientService implements ClientServiceInt {
 
     public Optional<Client> deleteClient(Long id) {
 
-        log.trace("delete client id={}", id);
+        log.info("delete client id={}", id);
         Optional<Client> entity=repository.findById(id);
+        Assert.isTrue(entity.isPresent(), "Cannot delete client. Id not found.");
         entity.ifPresent(e->repository.deleteById(id));
-        log.trace("method finished---");
+        log.info("method finished---");
         return entity;
     }
 
@@ -105,9 +106,17 @@ public class ClientService implements ClientServiceInt {
     public Optional<Client> findOne(long cnp){
         log.trace("findClient id={}",cnp);
         Optional<Client> client= repository.findById(cnp);
+        Assert.isTrue(client.isPresent(), "Cannot find client with the given id.");
         log.trace("method finished ---");
         return client;
     }
+
+    /**
+     * Adds an account to a client for clientId, and the account specified in the parameter
+     * @param clientId
+     * @param newAccount
+     * @return the client object after the add is performed
+     */
     @Transactional
     public Optional<Client> addAccount(long clientId, Account newAccount){
         log.info("adding.... ");
@@ -119,6 +128,17 @@ public class ClientService implements ClientServiceInt {
         accountRepository.save(newAccount);
         return Optional.of(client);
 
+    }
+
+    /**
+     * Gets all accounts in the database
+     * @return the list of accounts
+     */
+    public List<Account> getAllAccounts(){
+        log.info("Getting accounts in service");
+        List<Account> accounts = accountRepository.findAll();
+        log.info("Number of accounts: " + accounts.size());
+        return accounts;
     }
 
 }
